@@ -3,53 +3,135 @@ import React from "react";
 import { OPTIONS } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import Image from "next/image";
+import Quiez from "../_components/quiez/page";
 
-async function fetchProducts() {
-  try {
-    const response = await fetch("https://fakestoreapi.com/products");
-    if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.statusText}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return []; // Return an empty array as fallback
-  }
-}
-
+// Fetch session and data
 export default async function Product() {
   // Check for user session
   const session = await getServerSession(OPTIONS);
 
   if (!session) {
     redirect("/api/auth/signin");
-    return null; // Ensure no further rendering happens
+    return null; // Prevent further rendering
   }
 
   // Fetch product data
-  const productsData = await fetchProducts();
+  async function fetchSubjects() {
+    try {
+      const response = await fetch(
+        "https://exam.elevateegy.com/api/v1/subjects",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: session.token,
+          },
+        }
+      );
 
+      if (!response.ok) {
+        throw new Error(`Failed to fetch products: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      return []; // Return fallback empty array
+    }
+  }
+
+  // Fetch subjects
+  const { subjects } = await fetchSubjects();
+
+  // UI rendering
   return (
     <section>
-      <div className="w-3/4 m-auto flex flex-wrap justify-center items-center">
-        {productsData.length > 0 ? (
-          productsData.map((product) => (
-            <div key={product.id} className="w-3/12 p-4">
-              <Image
-                width={200}
-                height={200}
-                src={product.image}
-                alt={product.title}
-                className="w-full h-auto"
-              />
-              <h2 className="text-center text-lg font-bold mt-2">
-                {product.title}
-              </h2>
-            </div>
-          ))
-        ) : (
-          <p className="text-center text-gray-500">No products found.</p>
-        )}
+      <button
+        data-drawer-target="logo-sidebar"
+        data-drawer-toggle="logo-sidebar"
+        aria-controls="logo-sidebar"
+        type="button"
+        class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+      >
+        <span class="sr-only">Open sidebar</span>
+        <svg
+          class="w-6 h-6"
+          aria-hidden="true"
+          fill="currentColor"
+          viewBox="0 0 20 20"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            clip-rule="evenodd"
+            fill-rule="evenodd"
+            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
+          ></path>
+        </svg>
+      </button>
+
+      <aside
+        id="logo-sidebar"
+        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+        aria-label="Sidebar"
+      >
+        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+          <a href="/" class="flex items-center ps-2.5 mb-5">
+            <span class="self-center text-xl font-semibold whitespace-nowrap text-[#414448] dark:text-white">
+              ELEVATE
+            </span>
+          </a>
+          <ul className="space-y-2 font-medium">
+            <li>
+              <button className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group">
+                <svg
+                  className="w-5 h-5 text-[#4461f2] transition duration-75 dark:text-gray-400 group-hover:text-white dark:group-hover:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 22 21"
+                >
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                </svg>
+                <span className="ms-3">Dashboard</span>
+              </button>
+            </li>{" "}
+            <li>
+              <button className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group">
+                <svg
+                  className="w-5 h-5 text-[#4461f2] transition duration-75 dark:text-gray-400 group-hover:text-white dark:group-hover:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 22 21"
+                >
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                </svg>
+                <span className="ms-3">Quiz History</span>
+              </button>
+            </li>
+            <li>
+              <button className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group">
+                <svg
+                  className="w-5 h-5 text-[#4461f2] transition duration-75 dark:text-gray-400 group-hover:text-white dark:group-hover:text-white"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 22 21"
+                >
+                  <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
+                  <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+                </svg>
+                <span className="ms-3">Log Out</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <div class="p-4 sm:ml-64">
+        <Quiez />
       </div>
     </section>
   );

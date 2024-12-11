@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import Joi from "joi";
+import { useSession } from "next-auth/react";
 
 export default function ForgotPasswordForm() {
   const [formData, setFormData] = useState({ email: "" });
@@ -41,13 +42,13 @@ export default function ForgotPasswordForm() {
       return;
     }
 
-    setErrors({}); // Clear errors if validation passes
-    setMessage(null); // Clear any previous messages
+    setErrors({}); 
+    setMessage(null); 
     setIsSubmitting(true);
 
     try {
       // Simulate an API call for password recovery
-      const response = await fetch("/api/auth/forgot-password", {
+      const response = await fetch("https://exam.elevateegy.com/api/v1/auth/forgotPassword", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +62,7 @@ export default function ForgotPasswordForm() {
         setMessage("A recovery email has been sent. Please check your inbox.");
         setFormData({ email: "" }); // Clear the form
       } else {
-        setErrors({ form: data.message || "Something went wrong. Please try again." });
+        setErrors({ form: data?.message || "Something went wrong. Please try again." });
       }
     } catch (error) {
       console.error("Error:", error);

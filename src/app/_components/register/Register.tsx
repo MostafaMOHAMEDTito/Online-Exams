@@ -2,11 +2,10 @@
 
 import { FormEvent, useState } from "react";
 import Joi from "joi";
-import { useRouter } from "next/router";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
-  // const router = useRouter();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -61,7 +60,7 @@ export default function RegisterForm() {
       .required()
       .messages({
         "string.empty": "Phone number is required",
-        "string.pattern.base": "Enter a valid phone number (e.g., +123456789)",
+        "string.pattern.base": "Enter a valid phone number (01023456789)",
       }),
   });
 
@@ -127,8 +126,10 @@ export default function RegisterForm() {
       setIsSubmitting(false);
 
       // Redirect to login page after successful signup
-      
-      // router.push("/login");
+
+      setTimeout(() => {
+        router.push("/login");
+      }, 2000);
     } catch (err) {
       console.error("Error submitting form:", err);
       setErrors({

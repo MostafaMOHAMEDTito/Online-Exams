@@ -1,6 +1,6 @@
-import ForgotPasswordForm from "@/components/forgetPassword/ForgotPassword";
-import LoginForm from "@/components/login/Login";
-import RegisterForm from "@/components/register/Register";
+import ForgotPasswordForm from "@/app/_components/forgetPassword/ForgotPassword";
+import LoginForm from "@/app/_components/login/Login";
+import RegisterForm from "@/app/_components/register/Register";
 import Image from "next/image";
 import Link from "next/link";
 

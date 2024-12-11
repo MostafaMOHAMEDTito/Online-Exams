@@ -1,6 +1,4 @@
-import LoginForm from "@/components/login/Login";
-import RegisterForm from "@/components/register/Register";
-import { signIn } from "next-auth/react";
+import LoginForm from "@/app/_components/login/Login";
 import Image from "next/image";
 import Link from "next/link";
 

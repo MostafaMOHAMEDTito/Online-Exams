@@ -1,11 +1,57 @@
 "use client";
-
+import { useSession, getToken, signOut } from "next-auth/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React from "react";
 
-export default function Navbar() {
-  let pathName = usePathname();
+export default  function Navbar() {
+  const pathName = usePathname();
+  const router = useRouter();
+  const {data , status} = useSession();
+
+  async function logout() {
+    try {
+      const token = await getToken({ client: true });
+      console.log(token);
+      if (!token) {
+        console.error("Token not found or invalid");
+        return;
+      }
+
+      // Send API request with token in headers
+      const res = await fetch(
+        "https://exam.elevateegy.com/api/v1/auth/logout",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: token,
+          },
+        }
+      );
+
+      const responseData = await res.json();
+      console.log("Logout Response:", responseData);
+
+      if (res.ok) {
+        router.push("/login"); // Redirect to login after successful logout
+      } else {
+        console.error("Failed to logout:", responseData);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  }
+  
+  async function handleSignOut() {
+    try {
+      // Trigger NextAuth sign-out with a callback URL
+      await signOut({ callbackUrl: "/login" });
+    } catch (error) {
+      console.error("Error during sign-out:", error);
+    }
+  }
+
 
   return (
     <>
@@ -58,30 +104,46 @@ export default function Navbar() {
                   Product
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/login"
-                  className={
-                    pathName === "/login"
-                      ? "block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                      : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                  }
-                >
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/register"
-                  className={
-                    pathName === "/register"
-                      ? "block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
-                      : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                  }
-                >
-                  Register
-                </Link>
-              </li>
+              {!data && (
+                <>
+                  <li>
+                    <Link
+                      href="/login"
+                      className={
+                        pathName === "/login"
+                          ? "block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+                          : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                      }
+                    >
+                      Login
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      href="/register"
+                      className={
+                        pathName === "/register"
+                          ? "block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+                          : "block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                      }
+                    >
+                      Register
+                    </Link>
+                  </li>
+                </>
+              )}
+              {data && (
+                <li>
+                  <button
+                    onClick={handleSignOut}
+                    className={
+                      "block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500"
+                    }
+                  >
+                    LogOut
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         </div>

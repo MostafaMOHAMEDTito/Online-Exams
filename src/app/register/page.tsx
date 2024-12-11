@@ -1,10 +1,6 @@
-"use client";
-import LoginForm from "@/components/login/Login";
-import RegisterForm from "@/components/register/Register";
-import { signIn } from "next-auth/react";
+import RegisterForm from "@/app/_components/register/Register";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
 
 export default function Signin() {
   return (
