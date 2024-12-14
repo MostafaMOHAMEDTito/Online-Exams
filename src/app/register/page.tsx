@@ -1,4 +1,4 @@
-import RegisterForm from "@/app/_components/register/Register";
+import RegisterForm from "@/app/_components/Register/Register";
 import Image from "next/image";
 import Link from "next/link";
 

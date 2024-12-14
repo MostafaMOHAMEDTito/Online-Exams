@@ -7,6 +7,7 @@ import Joi from "joi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+import { title } from "process";
 
 interface FormData {
   email: string;
@@ -67,34 +68,83 @@ export default function LoginForm() {
     setErrors({});
 
     try {
-      // Attempt to sign in
-      const result: any = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        callbackUrl: "/",
-        redirect: false, // Prevent automatic redirection to handle errors
+      const res: any = await fetch(
+        "https://exam.elevateegy.com/api/v1/auth/signin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
+      let result = await res.json();
+      console.log(result);
+
+      if (!res.ok) {
+        setErrors({ form: result?.message || "Invalid email or password." });
+        return;
+      }
+      //save token in local storage
+      localStorage.setItem("token", result.token);
+      // Redirect to the dashboard if successful login
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "center",
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+          toast.onmouseenter = Swal.stopTimer;
+          toast.onmouseleave = Swal.resumeTimer;
+        }
+      });
+      Toast.fire({
+        icon: "success",
+        title: "Login successfully"
       });
 
-      if (result?.error) {
-        setErrors({ form: result.error });
-      } else if (result?.ok && result?.url) {
-        Swal.fire({
-          title: "Welcome",
-          text: "welcome in online exams!",
-          icon: "success",
-        });
-
-        setTimeout(() => {
-          router.push(result.url);
-        }, 1000); // Use the provided callback URL
-      } else {
-        setErrors({ form: "Unexpected error. Please try again." });
-      }
-    } catch (err) {
-      console.error("Sign-in error:", err);
+      setTimeout(() => {
+        router.push("/");
+      }, 500); // Use the provided callback URL
+    } catch (error) {
+      console.error("API request error:", error);
       setErrors({ form: "An unexpected error occurred. Please try again." });
     }
   };
+
+  //   try {
+  //     // Attempt to sign in
+  //     const result: any = await signIn("credentials", {
+  //       email: formData.email,
+  //       password: formData.password,
+  //       callbackUrl: "/",
+  //       redirect: false, // Prevent automatic redirection to handle errors
+  //     });
+
+  //     if (result?.error) {
+  //       setErrors({ form: result.error });
+  //     } else if (result?.ok && result?.url) {
+  //       Swal.fire({
+  //         title: "Welcome",
+  //         text: "welcome in online exams!",
+  //         icon: "success",
+  //       });
+
+  //       setTimeout(() => {
+  //         router.push(result.url);
+  //       }, 1000); // Use the provided callback URL
+  //     } else {
+  //       setErrors({ form: "Unexpected error. Please try again." });
+  //     }
+  //   } catch (err) {
+  //     console.error("Sign-in error:", err);
+  //     setErrors({ form: "An unexpected error occurred. Please try again." });
+  //   }
+  // };
 
   return (
     <div className="flex flex-col gap-8 justify-center items-center h-full">

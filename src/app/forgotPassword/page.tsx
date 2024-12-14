@@ -1,11 +1,10 @@
-import ForgotPasswordForm from "@/app/_components/forgetPassword/ForgotPassword";
-import LoginForm from "@/app/_components/login/Login";
-import RegisterForm from "@/app/_components/register/Register";
+import ForgotPasswordForm from "@/app/_components/ForgetPassword/ForgotPassword";
+import LoginForm from "@/app/_components/Login/Login";
+import RegisterForm from "@/app/_components/Register/Register";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function ForgotPassword() {
-  const components = [<LoginForm />, <RegisterForm />];
 
   return (
     <div className="login grid grid-cols-3 gap-8  space-y-10 h-screen">
