@@ -8,6 +8,7 @@ import { getAllSubjects } from "@/lib/subjectsSlice";
 import { RotatingLines } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import LoadingSpinner from "../loadingSpinner/page";
 
 export default function Quiez() {
   const router = useRouter();
@@ -42,18 +43,7 @@ export default function Quiez() {
   // Conditional Rendering for Loading, Error, and Content States
   if (isLoading || subjects.length === 0) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-black">
-        <RotatingLines
-          visible={true}
-          height="96"
-          width="96"
-          color="rgb(98,172,249)"
-          strokeWidth="5"
-          animationDuration="0.75"
-          ariaLabel="rotating-lines-loading"
-          
-        />
-      </div>
+      <LoadingSpinner/>
     );
   }
 
@@ -72,30 +62,29 @@ export default function Quiez() {
     <section className="w-5/6 mx-auto">
       <h3 className="text-[#4461F2] font-bold text-2xl mb-6 ">Quizzes</h3>
       <div className="flex flex-wrap justify-center gap-4">
-  {subjects.map(
-    (subject: { _id: string; name: string; icon?: string }) => (
-      <Link
-      href={"/"}
-        key={subject._id}
-        className="relative sm:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)] box-border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 bg-white"
-      >
-        <Image
-          width={400}
-          height={400}
-          src={subject.icon || "/placeholder.jpg"}
-          alt={subject.name || "No Title"}
-          className="w-full h-auto rounded-t-lg object-cover"
-        />
-        <div className="bg-blue-400/45 p-3 rounded-b-lg absolute top-3/4 inset-x-5 w-3/4 flex items-center justify-center">
-          <h2 className="text-white text-center text-lg font-bold">
-            {subject.name || "Untitled"}
-          </h2>
-        </div>
-      </Link>
-    )
-  )}
-</div>
-
+        {subjects.map(
+          (subject: { _id: string; name: string; icon?: string }) => (
+            <Link
+              href={"/product/quizHistory"}
+              key={subject._id}
+              className="relative sm:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)] box-border rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 bg-white"
+            >
+              <Image
+                width={400}
+                height={400}
+                src={subject.icon || "/placeholder.jpg"}
+                alt={subject.name || "No Title"}
+                className="w-full h-auto rounded-t-lg object-cover"
+              />
+              <div className="bg-blue-400/45 p-3 rounded-b-lg absolute top-3/4 inset-x-5 w-3/4 flex items-center justify-center">
+                <h2 className="text-white text-center text-lg font-bold">
+                  {subject.name || "Untitled"}
+                </h2>
+              </div>
+            </Link>
+          )
+        )}
+      </div>
     </section>
   );
 }
