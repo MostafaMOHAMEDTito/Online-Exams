@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "./_components/navbar/page";
-import AuthProvider from "@/context/authProvider";
+import Swal from "sweetalert2/dist/sweetalert2.js";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -27,13 +26,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased scrollbar-track-sky-700 scrollbar-thumb-sky-700`}
       >
-        <AuthProvider>
-          {/* <Navbar /> */}
-        </AuthProvider>
         {children}
       </body>
     </html>

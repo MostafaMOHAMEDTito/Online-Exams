@@ -1,14 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { useState, FormEvent, ChangeEvent } from "react";
 import { signIn } from "next-auth/react";
 import Joi from "joi";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+
+interface FormData {
+  email: string;
+  password: string;
+}
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+  form?: string;
+}
 
 export default function LoginForm() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<FormData>({
+    email: "",
+    password: "",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+  const router = useRouter();
 
   // Joi schema for validation
   const schema = Joi.object({
@@ -24,11 +41,13 @@ export default function LoginForm() {
     }),
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle input changes
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
+  // Handle form submission
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -36,27 +55,40 @@ export default function LoginForm() {
     const validationResult = schema.validate(formData, { abortEarly: false });
 
     if (validationResult.error) {
-      // Collect validation errors
-      const validationErrors: Record<string, string> = {};
+      const validationErrors: FormErrors = {};
       validationResult.error.details.forEach((detail) => {
-        validationErrors[detail.path[0] as string] = detail.message;
+        validationErrors[detail.path[0] as keyof FormErrors] = detail.message;
       });
       setErrors(validationErrors);
       return;
     }
 
-    setErrors({}); 
+    // Clear errors on successful validation
+    setErrors({});
 
     try {
       // Attempt to sign in
-      const result = await signIn("credentials", {
+      const result: any = await signIn("credentials", {
         email: formData.email,
         password: formData.password,
         callbackUrl: "/",
+        redirect: false, // Prevent automatic redirection to handle errors
       });
 
       if (result?.error) {
         setErrors({ form: result.error });
+      } else if (result?.ok && result?.url) {
+        Swal.fire({
+          title: "Welcome",
+          text: "welcome in online exams!",
+          icon: "success",
+        });
+
+        setTimeout(() => {
+          router.push(result.url);
+        }, 1000); // Use the provided callback URL
+      } else {
+        setErrors({ form: "Unexpected error. Please try again." });
       }
     } catch (err) {
       console.error("Sign-in error:", err);
@@ -73,6 +105,7 @@ export default function LoginForm() {
       >
         <p className="font-semibold text-lg">Sign in</p>
 
+        {/* Email Input */}
         <input
           type="email"
           name="email"
@@ -86,6 +119,7 @@ export default function LoginForm() {
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
+        {/* Password Input */}
         <input
           type="password"
           name="password"
@@ -101,14 +135,18 @@ export default function LoginForm() {
           <p className="text-red-500 text-sm">{errors.password}</p>
         )}
 
+        {/* Form Error */}
         {errors.form && <p className="text-red-500 text-sm">{errors.form}</p>}
 
+        {/* Recover Password Link */}
         <Link
           href={"/forgotPassword"}
           className="text-xs text-[#122D9C] text-end cursor-pointer hover:underline"
         >
           Recover Password?
         </Link>
+
+        {/* Submit Button */}
         <button
           type="submit"
           className="bg-[#4461F2] text-white font-light text-sm w-full p-3 rounded-2xl hover:bg-[#3653c2]"
@@ -117,12 +155,14 @@ export default function LoginForm() {
         </button>
       </form>
 
+      {/* Divider */}
       <div className="flex gap-3 items-center">
         <div className="divider h-[1px] bg-[#E7E7E7] w-12"></div>
         <p>or Continue with</p>
         <div className="divider h-[1px] bg-[#E7E7E7] w-12"></div>
       </div>
 
+      {/* Social Login */}
       <div className="social-login flex gap-4">
         <div
           onClick={() => signIn("github", { callbackUrl: "/product" })}

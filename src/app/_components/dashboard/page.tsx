@@ -1,61 +1,51 @@
+import { OPTIONS } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import React from "react";
-import { OPTIONS } from "../api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import Image from "next/image";
-import Quiez from "../_components/quiez/page";
+import React from "react";
 
-// Fetch session and data
-export default async function Product() {
-  // Check for user session
-  const session = await getServerSession(OPTIONS);
+export default async function Dashboard() {
+    // Check for user session
+    const session :any = await getServerSession(OPTIONS);
 
-  if (!session) {
-    redirect("/api/auth/signin");
-    return null; // Prevent further rendering
-  }
-
-  // Fetch product data
-  async function fetchSubjects() {
-    try {
-      const response = await fetch(
-        "https://exam.elevateegy.com/api/v1/subjects",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            token: session.token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch products: ${response.statusText}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return []; // Return fallback empty array
+    if (!session) {
+      redirect("/api/auth/signin");
+      return null; // Prevent further rendering
     }
-  }
-
-  // Fetch subjects
-  const { subjects } = await fetchSubjects();
-
-  // UI rendering
+    // logout from user session
+    async function logout() {
+      try {
+        // Send API request with token in headers
+        const res = await fetch(
+          "https://exam.elevateegy.com/api/v1/auth/logout",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              token: session?.token || "",
+            },
+          }
+        );
+        if (!res.ok) {
+          throw new Error(`Failed to log out: ${res.statusText}`);
+        }
+        return res.json();
+      } catch (err) {
+        console.error("Error logging out:", err);
+      }
+    }
+    console.log(logout())
   return (
-    <section>
+    <>
       <button
         data-drawer-target="logo-sidebar"
         data-drawer-toggle="logo-sidebar"
         aria-controls="logo-sidebar"
         type="button"
-        class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+        className="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
       >
-        <span class="sr-only">Open sidebar</span>
+        <span className="sr-only">Open sidebar</span>
         <svg
-          class="w-6 h-6"
+          className="w-6 h-6"
           aria-hidden="true"
           fill="currentColor"
           viewBox="0 0 20 20"
@@ -71,12 +61,12 @@ export default async function Product() {
 
       <aside
         id="logo-sidebar"
-        class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+        className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
         aria-label="Sidebar"
       >
-        <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-          <a href="/" class="flex items-center ps-2.5 mb-5">
-            <span class="self-center text-xl font-semibold whitespace-nowrap text-[#414448] dark:text-white">
+        <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
+          <a href="/" className="flex items-center ps-2.5 mb-5">
+            <span className="self-center text-xl font-semibold whitespace-nowrap text-[#414448] dark:text-white">
               ELEVATE
             </span>
           </a>
@@ -129,10 +119,6 @@ export default async function Product() {
           </ul>
         </div>
       </aside>
-
-      <div class="p-4 sm:ml-64">
-        <Quiez />
-      </div>
-    </section>
+    </>
   );
 }

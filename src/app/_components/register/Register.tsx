@@ -3,6 +3,7 @@
 import { FormEvent, useState } from "react";
 import Joi from "joi";
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -127,9 +128,15 @@ export default function RegisterForm() {
 
       // Redirect to login page after successful signup
 
+      Swal.fire({
+        title: "Register Success",
+        text: "welcome in online exams",
+        icon: "success",
+      });
+
       setTimeout(() => {
         router.push("/login");
-      }, 2000);
+      }, 200);
     } catch (err) {
       console.error("Error submitting form:", err);
       setErrors({
