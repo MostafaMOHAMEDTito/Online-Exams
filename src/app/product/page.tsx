@@ -9,8 +9,7 @@ export default async function Product() {
   // UI rendering
   return (
     <section>
-      <Dashboard />
-      <div className="p-4 sm:ml-64">
+      <div className="">
         <Quiez />
       </div>
     </section>

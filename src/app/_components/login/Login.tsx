@@ -7,7 +7,6 @@ import Joi from "joi";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-import { title } from "process";
 
 interface FormData {
   email: string;
@@ -68,104 +67,68 @@ export default function LoginForm() {
     setErrors({});
 
     try {
-      const res: any = await fetch(
+      const res = await fetch(
         "https://exam.elevateegy.com/api/v1/auth/signin",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-          }),
+          body: JSON.stringify(formData),
         }
       );
-      let result = await res.json();
-      console.log(result);
+
+      const result = await res.json();
 
       if (!res.ok) {
         setErrors({ form: result?.message || "Invalid email or password." });
         return;
       }
-      //save token in local storage
+
+      // Save the token in local storage
       localStorage.setItem("token", result.token);
-      // Redirect to the dashboard if successful login
-      const Toast = Swal.mixin({
-        toast: true,
-        position: "center",
-        showConfirmButton: false,
-        timer: 1000,
-        timerProgressBar: true,
-        didOpen: (toast) => {
-          toast.onmouseenter = Swal.stopTimer;
-          toast.onmouseleave = Swal.resumeTimer;
-        }
-      });
-      Toast.fire({
+
+      // Display success notification
+      Swal.fire({
         icon: "success",
-        title: "Login successfully"
+        title: "Login successful",
+        text: "Redirecting...",
+        timer: 1000,
+        showConfirmButton: false,
+        timerProgressBar: true,
       });
 
+      // Redirect to dashboard
       setTimeout(() => {
         router.push("/");
-      }, 500); // Use the provided callback URL
+      }, 500);
     } catch (error) {
       console.error("API request error:", error);
       setErrors({ form: "An unexpected error occurred. Please try again." });
     }
   };
 
-  //   try {
-  //     // Attempt to sign in
-  //     const result: any = await signIn("credentials", {
-  //       email: formData.email,
-  //       password: formData.password,
-  //       callbackUrl: "/",
-  //       redirect: false, // Prevent automatic redirection to handle errors
-  //     });
-
-  //     if (result?.error) {
-  //       setErrors({ form: result.error });
-  //     } else if (result?.ok && result?.url) {
-  //       Swal.fire({
-  //         title: "Welcome",
-  //         text: "welcome in online exams!",
-  //         icon: "success",
-  //       });
-
-  //       setTimeout(() => {
-  //         router.push(result.url);
-  //       }, 1000); // Use the provided callback URL
-  //     } else {
-  //       setErrors({ form: "Unexpected error. Please try again." });
-  //     }
-  //   } catch (err) {
-  //     console.error("Sign-in error:", err);
-  //     setErrors({ form: "An unexpected error occurred. Please try again." });
-  //   }
-  // };
-
   return (
-    <div className="flex flex-col gap-8 justify-center items-center h-full">
+    <div className="flex flex-col gap-8 justify-center items-center h-screen bg-gray-50">
       <form
         autoComplete="off"
         onSubmit={handleSubmit}
-        className="w-[35%] flex flex-col gap-6"
+        className="w-full max-w-md flex flex-col gap-6 bg-white shadow-lg rounded-lg p-6"
       >
-        <p className="font-semibold text-lg">Sign in</p>
+        <h2 className="font-semibold text-xl text-center text-gray-700">
+          Sign In
+        </h2>
 
         {/* Email Input */}
         <input
           type="email"
           name="email"
-          className={`w-full shadow-lg border-2 p-2 rounded-lg focus-visible:outline ${
-            errors.email ? "border-red-500" : ""
+          className={`w-full border p-3 rounded-lg focus:outline-none ${
+            errors.email ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          autoComplete="off"
         />
         {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
 
@@ -173,13 +136,12 @@ export default function LoginForm() {
         <input
           type="password"
           name="password"
-          className={`w-full shadow-lg border-2 p-2 rounded-lg focus-visible:outline ${
-            errors.password ? "border-red-500" : ""
+          className={`w-full border p-3 rounded-lg focus:outline-none ${
+            errors.password ? "border-red-500" : "border-gray-300"
           }`}
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
-          autoComplete="off"
         />
         {errors.password && (
           <p className="text-red-500 text-sm">{errors.password}</p>
@@ -191,7 +153,7 @@ export default function LoginForm() {
         {/* Recover Password Link */}
         <Link
           href={"/forgotPassword"}
-          className="text-xs text-[#122D9C] text-end cursor-pointer hover:underline"
+          className="text-sm text-blue-600 text-right hover:underline"
         >
           Recover Password?
         </Link>
@@ -199,7 +161,7 @@ export default function LoginForm() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="bg-[#4461F2] text-white font-light text-sm w-full p-3 rounded-2xl hover:bg-[#3653c2]"
+          className="w-full bg-blue-500 text-white font-medium text-lg py-3 rounded-lg hover:bg-blue-600 transition"
         >
           Sign in
         </button>
@@ -207,28 +169,28 @@ export default function LoginForm() {
 
       {/* Divider */}
       <div className="flex gap-3 items-center">
-        <div className="divider h-[1px] bg-[#E7E7E7] w-12"></div>
-        <p>or Continue with</p>
-        <div className="divider h-[1px] bg-[#E7E7E7] w-12"></div>
+        <div className="h-[1px] bg-gray-300 w-12"></div>
+        <p className="text-gray-500">or Continue with</p>
+        <div className="h-[1px] bg-gray-300 w-12"></div>
       </div>
 
       {/* Social Login */}
-      <div className="social-login flex gap-4">
+      <div className="flex gap-4">
         <div
           onClick={() => signIn("github", { callbackUrl: "/product" })}
-          className="login-item flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
+          className="flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
         >
           <Image width={20} height={20} alt="github" src={"/download.png"} />
         </div>
         <div
           onClick={() => signIn("google", { callbackUrl: "/product" })}
-          className="login-item flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
+          className="flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
         >
           <Image width={20} height={20} alt="google" src={"/Logo Google.png"} />
         </div>
         <div
           onClick={() => signIn("facebook", { callbackUrl: "/product" })}
-          className="login-item flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
+          className="flex justify-center hover:shadow-lg items-center border p-2 shadow-md rounded-lg cursor-pointer"
         >
           <Image width={20} height={20} alt="facebook" src={"/Vector.png"} />
         </div>

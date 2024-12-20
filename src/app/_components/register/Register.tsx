@@ -122,12 +122,9 @@ export default function RegisterForm() {
         setIsSubmitting(false);
         return;
       }
-
-      console.log("Signup successful!", { user: result });
       setIsSubmitting(false);
 
       // Redirect to login page after successful signup
-
       Swal.fire({
         title: "Register Success",
         text: "welcome in online exams",

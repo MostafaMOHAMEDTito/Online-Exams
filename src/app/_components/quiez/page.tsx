@@ -1,11 +1,9 @@
 "use client";
-
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import { useEffect, useState } from "react";
 import { getAllSubjects } from "@/lib/subjectsSlice";
-import { RotatingLines } from "react-loader-spinner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import LoadingSpinner from "../loadingSpinner/page";
@@ -17,16 +15,16 @@ export default function Quiez() {
   // State to store token
   const [token, setToken] = useState<string | null>(null);
 
-  // Fetch the token from localStorage on the client side
+
+  // Fetch the token from localStorage 
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      const savedToken = localStorage.getItem("token");
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
       setToken(savedToken);
     } else {
-      // No token, redirect to login page
       router.push("/login");
     }
-  }, [token]);
+  }, []);
 
   // Select subjects state from Redux
   const { subjects, isLoading, isError, error } = useSelector(
@@ -41,7 +39,7 @@ export default function Quiez() {
   }, [dispatch, token]);
 
   // Conditional Rendering for Loading, Error, and Content States
-  if (isLoading || subjects.length === 0) {
+  if (isLoading || subjects.length === 0 || !token) {
     return (
       <LoadingSpinner/>
     );
@@ -60,7 +58,7 @@ export default function Quiez() {
   // Render subjects
   return (
     <section className="w-5/6 mx-auto">
-      <h3 className="text-[#4461F2] font-bold text-2xl mb-6 ">Quizzes</h3>
+      <h3 className="text-maincolor font-bold text-2xl mb-6 ">Quizzes</h3>
       <div className="flex flex-wrap justify-center gap-4">
         {subjects.map(
           (subject: { _id: string; name: string; icon?: string }) => (

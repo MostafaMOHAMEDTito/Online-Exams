@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { RotatingLines } from "react-loader-spinner";
 import CSS from "../../../../public/CSS.png";
 import JS from "../../../../public/JS.png";
 import HTML from "../../../../public/HTML.png";
@@ -40,8 +39,8 @@ export default function QuizHistory() {
       confirmButtonText: "Start",
       html: `
       <ul>
-  <li>Duration: 20 minutes.</li>
-  <li>Questions: 25.</li>
+  <li>Duration: 10 minutes.</li>
+  <li>Questions: 10.</li>
   <li>Don't leave the page.</li>
   <li>Don't leave the page.</li>
 </ul>
@@ -155,7 +154,7 @@ export default function QuizHistory() {
               <div className="px-4 py-6 ">
                 <button
                   onClick={startQuizzes}
-                  className="bg-[#4461F2] text-white text-sm py-3 px-4 rounded-lg hover:bg-[#4461F2] transition-colors duration-200"
+                  className="bg-maincolor text-white text-sm py-3 px-4 rounded-lg hover:bg-maincolor transition-colors duration-200"
                 >
                   Start Quiz
                 </button>
@@ -167,7 +166,7 @@ export default function QuizHistory() {
       <div
         className={`${display} w-full  flex-wrap justify-center items-center justify-items-center bg-gray-200/70 h-screen absolute top-0 right-0 `}
       >
-        <div>
+        <div className="w-3/5">
           <StartQuiz />
         </div>
       </div>

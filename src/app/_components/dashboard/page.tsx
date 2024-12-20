@@ -121,7 +121,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => handleNavigation("/")}
-                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group"
+                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-maincolor hover:text-white dark:hover:bg-gray-700 group"
               >
                 <span className="ms-3">Dashboard</span>
               </button>
@@ -131,7 +131,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={() => handleNavigation("/product/quizHistory")}
-                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group"
+                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-maincolor hover:text-white dark:hover:bg-gray-700 group"
               >
                 <span className="ms-3">Quiz History</span>
               </button>
@@ -141,7 +141,7 @@ export default function Dashboard() {
             <li>
               <button
                 onClick={logout}
-                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-[#4461f2] hover:text-white dark:hover:bg-gray-700 group"
+                className="flex items-center p-2 text-[#7B8089] rounded-lg dark:text-white hover:bg-maincolor hover:text-white dark:hover:bg-gray-700 group"
               >
                 <span className="ms-3">Log Out</span>
               </button>

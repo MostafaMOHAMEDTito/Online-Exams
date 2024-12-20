@@ -26,11 +26,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en"
+    className="scrollbar scrollbar-track-slate-500 scrollbar-thumb-black scrollbar-corner-gray-50">
       <AuthProvider >
       <Provider store={store}>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased scrollbar-track-sky-700 scrollbar-thumb-sky-700`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
         </body>
