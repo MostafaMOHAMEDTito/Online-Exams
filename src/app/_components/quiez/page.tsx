@@ -34,7 +34,7 @@ export default function Quiez() {
   // Fetch subjects when token is available
   useEffect(() => {
     if (token) {
-      dispatch(getAllSubjects(token));
+      dispatch(getAllSubjects());
     }
   }, [dispatch, token]);
 

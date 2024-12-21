@@ -4,54 +4,37 @@ import React, { useEffect, useState } from "react";
 import icon from "../../../../public/download (1).png";
 import Image from "next/image";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/lib/store";
+import { getAllQuestion } from "@/lib/questionSlice";
+import RenderInCorrectQuestions from "../_components/renderInCorrectQuestions/page";
+
 
 export default function StartQuiz() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [answers, setAnswers] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [answers, setAnswers] = useState<any[]>([]);
   const [timeDown, setTimeDown] = useState<number>(10 * 60);
   const [isDowntime, setIsDowntime] = useState(true);
   const [percentageScore, setPercentageScore] = useState(0);
   const [correctScore, setCorrectScore] = useState(0);
   const [inCorrectScore, setInCorrectScore] = useState(0);
-  const [display, setdisPlay] = useState(false); //change display
+  const [display, setdisPlay] = useState(1); // Change display state
+  const [incorrectQuestions, setincorrectQuestions] = useState<any> ([])
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setIsLoading(true);
-      try {
-        const res = await fetch(
-          "https://exam.elevateegy.com/api/v1/questions",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              token: token || "",
-            },
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch questions");
-
-        const data = await res.json();
-        setQuestions(data.questions || []);
-      } catch (err: any) {
-        setError(err.message || "An error occurred while fetching questions");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuestions();
-  }, [token]);
+  const dispatch = useDispatch<AppDispatch>();
+  const { questions = [], isLoading, isError, error } = useSelector(
+    (state: RootState) => state.questions
+  );
 
   useEffect(() => {
-    if (timeDown > 0 && isDowntime && !display) {
+    if (questions.length === 0) {
+      dispatch(getAllQuestion());
+    }
+  }, [dispatch, questions]);
+  
+
+  useEffect(() => {
+    if (timeDown > 0 && isDowntime ) {
       const time = setInterval(() => {
         setTimeDown((prevTimeDown) => prevTimeDown - 1);
       }, 1000);
@@ -87,9 +70,18 @@ export default function StartQuiz() {
       setCurrentQuestion(currentQuestion - 1);
     }
   };
+
   const handleFinished = () => {
-    setIsDowntime(false); // Stop the timer when the quiz is finished
-    // Calculate the user's score
+    // Stop the timer when the quiz is finished
+    setIsDowntime(false);
+  
+    // Validate `questions` and `answers` arrays
+    if (!questions || questions.length === 0) {
+      console.error("No questions provided.");
+      return;
+    }
+  
+    // Calculate correct score
     const correctScore = questions.reduce(
       (score: number, question: any, index: number) => {
         if (question.correct === answers[index]) {
@@ -99,21 +91,34 @@ export default function StartQuiz() {
       },
       0
     );
-    const percentageScore = (correctScore / questions.length) * 100;
-    const inCorrectScore =
-      ((questions.length - correctScore) / questions.length) * 100;
+  
+    // Calculate percentages
+    const percentageScore = Math.round((correctScore / questions.length) * 100);
+    const inCorrectScore = questions.length - correctScore;
+  
+    // Update state
     setCorrectScore(correctScore);
     setInCorrectScore(inCorrectScore);
     setPercentageScore(percentageScore);
-    // Display the results
-    setdisPlay(true);
+    setdisPlay(2); // Display the results
   };
+
+  const showResults = () => {
+    // Find all questions where the user's answer is incorrect
+    const incorrectQuestions = questions.filter((question: any, index: number) => {
+      return question.correct !== answers[index]; // Check if the answer is incorrect
+    });
+    setincorrectQuestions(incorrectQuestions)// Return the incorrect questions
+    setdisPlay(3); // Display the results
+  };
+
+  
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-50">
         <p className="text-xl text-red-500">{error}</p>
@@ -121,19 +126,20 @@ export default function StartQuiz() {
     );
   }
 
-  if (questions.length === 0) {
+  if (!Array.isArray(questions) || questions.length === 0) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-gray-50">
         <p className="text-xl text-gray-500">No questions available.</p>
       </div>
     );
   }
+  
 
   return (
     <div className="min-h-screen bg-gray-200/70 flex flex-col items-center p-4">
       <div
         className={
-          !display
+          display === 1
             ? "bg-white w-full shadow-2xl rounded-lg"
             : "bg-white w-full shadow-2xl rounded-lg hidden"
         }
@@ -243,9 +249,9 @@ export default function StartQuiz() {
       </div>
       <div
         className={
-          !display
-            ? "fixed inset-0 bg-black/50 hidden items-center justify-center"
-            : ` fixed inset-0 bg-black/50 flex items-center justify-center `
+          display === 2
+            ? "fixed inset-0 bg-black/50 flex items-center justify-center"
+            : ` fixed inset-0 bg-black/50 hidden items-center justify-center `
         }
       >
         <div className="bg-white w-96 p-6 rounded-lg shadow-lg">
@@ -294,17 +300,27 @@ export default function StartQuiz() {
             </div>
           </div>
           <div className="flex justify-between mt-6">
-            <Link href="/">
-              <button className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200">
+            <Link href="/"
+            className="w-5/12 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-200 ">
+              <button className=" w-full ">
                 Back
               </button>
             </Link>
 
-            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+            <button 
+            onClick={showResults}
+             className="px-4 py-2 w-5/12 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
               Show results
             </button>
           </div>
         </div>
+      </div>
+      <div className={
+        display === 3
+         ? " flex  "
+          : ` hidden `
+      }>
+        <RenderInCorrectQuestions  answers={answers} questions={incorrectQuestions}/>
       </div>
     </div>
   );

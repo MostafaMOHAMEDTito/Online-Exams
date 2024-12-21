@@ -1,10 +1,12 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { subjectsReducer } from "./subjectsSlice";
+import { questionsReducer } from "./questionSlice";
 
 export let store = configureStore({
   reducer:{
-    subjects : subjectsReducer
+    subjects : subjectsReducer ,
+    questions: questionsReducer
   }
 })
 

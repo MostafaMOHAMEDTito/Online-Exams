@@ -1,55 +1,54 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const getAllSubjects = createAsyncThunk(
-  "subjects/getAllSubjects",
+export const getAllQuestion = createAsyncThunk(
+  "questions/getAllQuestion",
   async (_, { rejectWithValue }) => {
     try {
-      const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      const res = await fetch("https://exam.elevateegy.com/api/v1/subjects", {
+      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const res = await fetch("https://exam.elevateegy.com/api/v1/questions", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           token: token || "",
         },
       });
+
+      if (!res.ok) throw new Error("Failed to fetch questions");
+
       const data = await res.json();
-      if (!res.ok) throw new Error("Failed to fetch subjects");
-      return data;
+      return data.questions;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
   }
 );
-
 const initialState = {
-  subjects: [],
+  questions: [],
   isLoading: false,
   isError: false,
   error: null,
 };
 
-const subjectsSlice = createSlice({
-  name: "subjects",
+const questionSlice = createSlice({
+  name: "question",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAllSubjects.pending, (state) => {
+      .addCase(getAllQuestion.pending, (state) => {
         state.isLoading = true;
         state.isError = false;
         state.error = null;
       })
-      .addCase(getAllSubjects.fulfilled, (state, action) => {
+      .addCase(getAllQuestion.fulfilled, (state, action) => {
+        state.questions = action.payload;
         state.isLoading = false;
-        state.subjects = action.payload.subjects;
       })
-      .addCase(getAllSubjects.rejected, (state: any, action) => {
+      .addCase(getAllQuestion.rejected, (state: any, action) => {
         state.isLoading = false;
         state.isError = true;
         state.error = action.payload;
       });
   },
 });
-
-export const subjectsReducer = subjectsSlice.reducer;
+export const questionsReducer = questionSlice.reducer;
